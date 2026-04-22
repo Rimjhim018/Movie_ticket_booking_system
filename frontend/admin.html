@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — CineBook</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<div class="admin-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar">
+    <a href="index.html" class="logo" style="display:block;padding:0 1.5rem 1.5rem">Cine<span style="color:var(--text)">Book</span></a>
+    <button class="sidebar-link active" id="sb-dashboard" onclick="showSection('dashboard')">📊 Dashboard</button>
+    <button class="sidebar-link" id="sb-movies" onclick="showSection('movies')">🎬 Movies</button>
+    <button class="sidebar-link" id="sb-showtimes" onclick="showSection('showtimes')">🕐 Showtimes</button>
+    <button class="sidebar-link" id="sb-users" onclick="showSection('users')">👥 Users</button>
+    <hr style="margin:1rem 0"/>
+    <button class="sidebar-link" onclick="logout()">🚪 Logout</button>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="admin-content">
+
+    <!-- DASHBOARD -->
+    <section id="sec-dashboard">
+      <div class="admin-header">
+        <h1>Dashboard</h1>
+        <span class="text-muted" id="admin-name"></span>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card accent"><div class="stat-label">Total Users</div><div class="stat-value" id="stat-users">—</div></div>
+        <div class="stat-card"><div class="stat-label">Total Movies</div><div class="stat-value" id="stat-movies">—</div></div>
+        <div class="stat-card success"><div class="stat-label">Total Bookings</div><div class="stat-value" id="stat-bookings">—</div></div>
+        <div class="stat-card"><div class="stat-label">Revenue (৳)</div><div class="stat-value" id="stat-revenue">—</div></div>
+      </div>
+      <div class="section-title">Recent Bookings</div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:auto">
+        <table id="recent-table">
+          <thead><tr><th>#ID</th><th>User</th><th>Movie</th><th>Seats</th><th>Total</th><th>Date</th><th>Status</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- MOVIES -->
+    <section id="sec-movies" style="display:none">
+      <div class="admin-header">
+        <h1>Movies</h1>
+        <button class="btn btn-primary" onclick="openMovieModal()">+ Add Movie</button>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:auto">
+        <table id="movies-table">
+          <thead><tr><th>ID</th><th>Title</th><th>Genre</th><th>Duration</th><th>Release Date</th><th>Actions</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SHOWTIMES -->
+    <section id="sec-showtimes" style="display:none">
+      <div class="admin-header">
+        <h1>Showtimes</h1>
+        <button class="btn btn-primary" onclick="openShowtimeModal()">+ Add Showtime</button>
+      </div>
+      <div class="form-group" style="max-width:300px;margin-bottom:1rem">
+        <select id="st-movie-filter" onchange="loadShowtimes()">
+          <option value="">Select Movie...</option>
+        </select>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:auto">
+        <table id="showtimes-table">
+          <thead><tr><th>ID</th><th>Date</th><th>Time</th><th>Hall</th><th>Seats Left</th><th>Price</th><th>Actions</th></tr></thead>
+          <tbody><tr><td colspan="7" class="text-muted" style="text-align:center;padding:2rem">Select a movie above</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- USERS -->
+    <section id="sec-users" style="display:none">
+      <div class="admin-header"><h1>Users</h1></div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:auto">
+        <table id="users-table">
+          <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Actions</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- MOVIE MODAL -->
+<div class="modal-overlay" id="movie-modal">
+  <div class="modal">
+    <h3 id="movie-modal-title">Add Movie</h3>
+    <input type="hidden" id="m-id"/>
+    <div class="form-group"><label>Title</label><input type="text" id="m-title" placeholder="Movie title"/></div>
+    <div class="form-group"><label>Genre</label>
+      <select id="m-genre">
+        <option>Action</option><option>Drama</option><option>Comedy</option>
+        <option>Sci-Fi</option><option>Horror</option><option>Fantasy</option><option>Romance</option><option>Thriller</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Duration (minutes)</label><input type="number" id="m-duration" placeholder="120"/></div>
+    <div class="form-group"><label>Release Date</label><input type="date" id="m-date"/></div>
+    <div class="form-group"><label>Description</label><textarea id="m-desc" rows="3" placeholder="Movie description..."></textarea></div>
+    <div class="form-group"><label>Poster URL</label><input type="text" id="m-poster" placeholder="https://..."/></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('movie-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveMovie()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHOWTIME MODAL -->
+<div class="modal-overlay" id="showtime-modal">
+  <div class="modal">
+    <h3>Add Showtime</h3>
+    <div class="form-group"><label>Movie</label><select id="st-movie-id"></select></div>
+    <div class="form-group"><label>Date</label><input type="date" id="st-date"/></div>
+    <div class="form-group"><label>Time</label><input type="time" id="st-time"/></div>
+    <div class="form-group"><label>Hall</label><input type="text" id="st-hall" placeholder="Hall 1"/></div>
+    <div class="form-group"><label>Total Seats</label><input type="number" id="st-seats" value="60"/></div>
+    <div class="form-group"><label>Price (৳)</label><input type="number" id="st-price" value="150"/></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('showtime-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveShowtime()">Add</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:5000/api';
+const token = localStorage.getItem('token');
+const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+if (!user || user.role !== 'admin') { location.href = 'login.html'; }
+document.getElementById('admin-name').textContent = `Admin: ${user?.name}`;
+
+function logout() { localStorage.clear(); location.href = 'index.html'; }
+
+function showSection(name) {
+  ['dashboard','movies','showtimes','users'].forEach(s => {
+    document.getElementById(`sec-${s}`).style.display = 'none';
+    document.getElementById(`sb-${s}`)?.classList.remove('active');
+  });
+  document.getElementById(`sec-${name}`).style.display = 'block';
+  document.getElementById(`sb-${name}`)?.classList.add('active');
+  if (name === 'dashboard') loadDashboard();
+  if (name === 'movies') loadMoviesAdmin();
+  if (name === 'users') loadUsers();
+  if (name === 'showtimes') loadMovieSelect();
+}
+
+// ── DASHBOARD ───────────────────────────────
+async function loadDashboard() {
+  try {
+    const res = await fetch(`${API}/admin/stats`, { headers: { Authorization: `Bearer ${token}` } });
+    const d = await res.json();
+    document.getElementById('stat-users').textContent = d.total_users;
+    document.getElementById('stat-movies').textContent = d.total_movies;
+    document.getElementById('stat-bookings').textContent = d.total_bookings;
+    document.getElementById('stat-revenue').textContent = parseFloat(d.revenue).toLocaleString();
+    const tbody = document.querySelector('#recent-table tbody');
+    tbody.innerHTML = d.recent_bookings.map(b => `
+      <tr>
+        <td>#${b.booking_id}</td>
+        <td>${b.name}</td>
+        <td>${b.movie_title}</td>
+        <td>${b.seat_numbers}</td>
+        <td>৳${b.total_price}</td>
+        <td>${new Date(b.booking_date).toLocaleDateString()}</td>
+        <td><span style="color:${b.status==='confirmed'?'var(--success)':'var(--accent)'}">${b.status}</span></td>
+      </tr>
+    `).join('');
+  } catch(e) {}
+}
+
+// ── MOVIES ──────────────────────────────────
+async function loadMoviesAdmin() {
+  const res = await fetch(`${API}/movies`);
+  const movies = await res.json();
+  const tbody = document.querySelector('#movies-table tbody');
+  tbody.innerHTML = movies.map(m => `
+    <tr>
+      <td>${m.movie_id}</td>
+      <td>${m.movie_title}</td>
+      <td><span class="badge">${m.genre}</span></td>
+      <td>${m.duration} min</td>
+      <td>${m.release_date?.slice(0,10)}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="editMovie(${m.movie_id})">Edit</button>
+        <button class="btn btn-sm" style="background:rgba(230,57,70,0.15);color:var(--accent);border:1px solid rgba(230,57,70,0.3)" onclick="deleteMovie(${m.movie_id})">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openMovieModal(movie = null) {
+  document.getElementById('movie-modal-title').textContent = movie ? 'Edit Movie' : 'Add Movie';
+  document.getElementById('m-id').value = movie?.movie_id || '';
+  document.getElementById('m-title').value = movie?.movie_title || '';
+  document.getElementById('m-genre').value = movie?.genre || 'Action';
+  document.getElementById('m-duration').value = movie?.duration || '';
+  document.getElementById('m-date').value = movie?.release_date?.slice(0,10) || '';
+  document.getElementById('m-desc').value = movie?.description || '';
+  document.getElementById('m-poster').value = movie?.poster_url || '';
+  document.getElementById('movie-modal').classList.add('open');
+}
+
+async function editMovie(id) {
+  const res = await fetch(`${API}/movies/${id}`);
+  const m = await res.json();
+  openMovieModal(m);
+}
+
+async function saveMovie() {
+  const id = document.getElementById('m-id').value;
+  const body = {
+    movie_title: document.getElementById('m-title').value,
+    genre: document.getElementById('m-genre').value,
+    duration: document.getElementById('m-duration').value,
+    release_date: document.getElementById('m-date').value,
+    description: document.getElementById('m-desc').value,
+    poster_url: document.getElementById('m-poster').value
+  };
+  const url = id ? `${API}/movies/${id}` : `${API}/movies`;
+  const method = id ? 'PUT' : 'POST';
+  await fetch(url, { method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(body) });
+  closeModal('movie-modal');
+  loadMoviesAdmin();
+}
+
+async function deleteMovie(id) {
+  if (!confirm('Delete this movie? All its showtimes will also be deleted.')) return;
+  await fetch(`${API}/movies/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+  loadMoviesAdmin();
+}
+
+// ── SHOWTIMES ────────────────────────────────
+async function loadMovieSelect() {
+  const res = await fetch(`${API}/movies`);
+  const movies = await res.json();
+  const sel1 = document.getElementById('st-movie-filter');
+  const sel2 = document.getElementById('st-movie-id');
+  [sel1, sel2].forEach(sel => {
+    sel.innerHTML = '<option value="">Select Movie...</option>' +
+      movies.map(m => `<option value="${m.movie_id}">${m.movie_title}</option>`).join('');
+  });
+}
+
+async function loadShowtimes() {
+  const movieId = document.getElementById('st-movie-filter').value;
+  if (!movieId) return;
+  const res = await fetch(`${API}/showtimes/${movieId}`);
+  const sts = await res.json();
+  const tbody = document.querySelector('#showtimes-table tbody');
+  if (!sts.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-muted" style="text-align:center;padding:2rem">No showtimes found</td></tr>'; return; }
+  tbody.innerHTML = sts.map(s => `
+    <tr>
+      <td>${s.showtime_id}</td>
+      <td>${s.show_date}</td>
+      <td>${s.show_time?.slice(0,5)}</td>
+      <td>${s.hall_number}</td>
+      <td>${s.available_seats}/${s.total_seats}</td>
+      <td>৳${s.price}</td>
+      <td><button class="btn btn-sm" style="background:rgba(230,57,70,0.15);color:var(--accent);border:1px solid rgba(230,57,70,0.3)" onclick="deleteShowtime(${s.showtime_id})">Delete</button></td>
+    </tr>
+  `).join('');
+}
+
+function openShowtimeModal() {
+  document.getElementById('showtime-modal').classList.add('open');
+}
+
+async function saveShowtime() {
+  const body = {
+    movie_id: document.getElementById('st-movie-id').value,
+    show_date: document.getElementById('st-date').value,
+    show_time: document.getElementById('st-time').value,
+    hall_number: document.getElementById('st-hall').value,
+    total_seats: document.getElementById('st-seats').value,
+    price: document.getElementById('st-price').value
+  };
+  if (!body.movie_id || !body.show_date || !body.show_time) { alert('Fill all fields'); return; }
+  await fetch(`${API}/showtimes`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(body) });
+  closeModal('showtime-modal');
+  loadShowtimes();
+}
+
+async function deleteShowtime(id) {
+  if (!confirm('Delete this showtime?')) return;
+  await fetch(`${API}/showtimes/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+  loadShowtimes();
+}
+
+// ── USERS ────────────────────────────────────
+async function loadUsers() {
+  const res = await fetch(`${API}/admin/users`, { headers: { Authorization: `Bearer ${token}` } });
+  const users = await res.json();
+  const tbody = document.querySelector('#users-table tbody');
+  tbody.innerHTML = users.map(u => `
+    <tr>
+      <td>${u.user_id}</td>
+      <td>${u.name}</td>
+      <td>${u.email}</td>
+      <td><span class="badge" style="${u.role==='admin'?'background:rgba(244,162,97,0.15);color:var(--warning);border-color:rgba(244,162,97,0.3)':''}">${u.role}</span></td>
+      <td>${new Date(u.created_at).toLocaleDateString()}</td>
+      <td>${u.role !== 'admin' ? `<button class="btn btn-sm" style="background:rgba(230,57,70,0.15);color:var(--accent);border:1px solid rgba(230,57,70,0.3)" onclick="deleteUser(${u.user_id})">Delete</button>` : '—'}</td>
+    </tr>
+  `).join('');
+}
+
+async function deleteUser(id) {
+  if (!confirm('Delete this user?')) return;
+  await fetch(`${API}/admin/users/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+  loadUsers();
+}
+
+// ── UTILS ─────────────────────────────────────
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// Init
+loadDashboard();
+</script>
+</body>
+</html>
