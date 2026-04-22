@@ -88,6 +88,7 @@
 * Secure login authentication 
 * Logout functionality 
 
+ ![image alt](https://github.com/Rimjhim018/Movie_ticket_booking_system/blob/91f406c084b18058b53ef74e446c212d89e1f30a/User_Reg.png)
   
 
 
