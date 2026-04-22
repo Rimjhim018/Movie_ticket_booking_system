@@ -1,9 +1,10 @@
 # Movie_ticket_booking_system
 
 
-##Group Details:
-Group Number: 04
-Team Members and Individual Contributions:
+# Group Details:
+## Group Number: 04
+#### Team Members and Individual Contributions:
+
 
 
 All functionalities implemented in the project.
