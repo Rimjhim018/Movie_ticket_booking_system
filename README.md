@@ -79,7 +79,8 @@
 
   ![image alt](https://github.com/Rimjhim018/Movie_ticket_booking_system/blob/0e1c2fa951f88b33e08031afaac33827bf7cb450/Movie_ticket_ER_Diagram.png)
 
-  1. User Registration and Login 
+## User Registration and Login
+  
  Users can create accounts and log in securely.
 
 **Functions include:**
