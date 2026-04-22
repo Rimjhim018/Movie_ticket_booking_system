@@ -1,0 +1,81 @@
+# 🎬 Movie Ticket Booking System — Complete Setup Guide
+
+## STEP 1: Install Required Software
+1. Download and install **Node.js**: https://nodejs.org (choose LTS version)
+2. Download and install **XAMPP**: https://www.apachefriends.org
+3. Download and install **VS Code**: https://code.visualstudio.com
+
+---
+
+## STEP 2: Set Up the Database
+1. Open **XAMPP Control Panel** → Start **Apache** and **MySQL**
+2. Open browser → go to: http://localhost/phpmyadmin
+3. Click **"New"** on the left sidebar
+4. Create a database named: `movie_booking`
+5. Click the **SQL** tab and paste the entire contents of `database.sql` → Click **Go**
+
+---
+
+## STEP 3: Set Up the Project Folder
+1. Open your **C drive** (or any folder)
+2. Create a new folder called: `movie-booking`
+3. Inside it, create two folders: `backend` and `frontend`
+
+Your folder structure should look like:
+```
+movie-booking/
+├── backend/
+│   ├── server.js
+│   ├── package.json (auto-created)
+│   └── .env
+└── frontend/
+    ├── index.html
+    ├── movies.html
+    ├── booking.html
+    ├── login.html
+    ├── register.html
+    ├── profile.html
+    ├── admin.html
+    └── style.css
+```
+
+---
+
+## STEP 4: Set Up Backend
+1. Open **VS Code**
+2. Open the `backend` folder in VS Code
+3. Create a file called `server.js` and paste the contents of `server.js`
+4. Create a file called `.env` and paste the contents of `.env`
+5. Open **Terminal** in VS Code (View → Terminal)
+6. Type these commands one by one:
+```
+npm init -y
+npm install express mysql2 bcryptjs jsonwebtoken cors dotenv multer
+```
+7. Then run the server:
+```
+node server.js
+```
+You should see: `Server running on port 5000`
+
+---
+
+## STEP 5: Set Up Frontend
+1. Copy all HTML files and `style.css` into the `frontend` folder
+2. Open `index.html` in your browser directly (double-click)
+   OR use VS Code Live Server extension
+
+---
+
+## STEP 6: Test the App
+- Open browser → go to `frontend/index.html`
+- Register a new account
+- Browse movies, book tickets!
+- Admin login: email = `admin@cinema.com`, password = `admin123`
+
+---
+
+## Troubleshooting
+- **"Cannot connect to database"** → Make sure XAMPP MySQL is running
+- **"npm not found"** → Restart VS Code after installing Node.js
+- **CORS error** → Make sure backend server is running (`node server.js`)
