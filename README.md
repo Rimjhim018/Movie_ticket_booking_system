@@ -125,6 +125,20 @@ Features include:
 * Mark booked seats as unavailable
 
 ![image alt](https://github.com/Rimjhim018/Movie_ticket_booking_system/blob/6bbfb2a88f647ca2ff27209f319e6a5bc2a83864/Seats.png)
+
+## 5.Booking Summary
+ 
+* View booked tickets 
+
+* Booking details
+  
+* Booking Confirm
+  
+* Payment 
+
+
+
+![image alt](https://github.com/Rimjhim018/Movie_ticket_booking_system/blob/95c6287f4be3ac553047fe9dd97d0edcde037544/History.png)
  
 
 
