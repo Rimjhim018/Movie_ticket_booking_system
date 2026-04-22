@@ -139,6 +139,40 @@ Features include:
 
 
 ![image alt](https://github.com/Rimjhim018/Movie_ticket_booking_system/blob/95c6287f4be3ac553047fe9dd97d0edcde037544/History.png)
+
+## 6.Admin Login & Dashboard
+
+The dashboard provides an overview of system statistics. 
+
+**Information includes:** 
+ 
+* Total movies
+  
+* Total bookings
+
+
+## 7.Movie Insert & Delete
+
+Admins can manage movies in the system. Functions include: 
+* Add new movies
+ 
+* Edit movie information
+  
+* Delete movies
+
+
+## 8. User Management 
+
+Admins can manage user accounts. 
+
+**Functions include:**
+
+* View all users
+ 
+* Delete user accounts
+
+
+
  
 
 
