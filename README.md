@@ -180,7 +180,8 @@ Admins can manage user accounts.
 ## 9.Responsive Design:
 
 * Mobile-friendly design for seamless access on various screen sizes.
- 
+
+  ![image alt](https://github.com/Rimjhim018/Movie_ticket_booking_system/blob/078e31694a289ba01080d7bac35f245926f93992/Responsive.png)
 
 
   
