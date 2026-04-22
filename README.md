@@ -177,7 +177,9 @@ Admins can manage user accounts.
    ![image alt](https://github.com/Rimjhim018/Movie_ticket_booking_system/blob/c218e613e9d0eb53fd6bc80a534b1ad7be807882/Users_show.png)
 
 
+## 9.Responsive Design:
 
+* Mobile-friendly design for seamless access on various screen sizes.
  
 
 
@@ -187,12 +189,16 @@ Admins can manage user accounts.
 
 
 
+## Video Link:
 
 All functionalities implemented in the project.
+
 A brief explanation of the frontend, including the layout, design, and styling.
+
 A brief explanation of the backend, node.js code, database interactions, and queries used for managing photos, events, and users.
-Technologies Used:
-Frontend: HTML, CSS, JavaScript
-Backend: Node.js,Express js
-Database: MySQL/phpmyadmin (XAMPP)
+
+## Technologies Used:
+**Frontend:** HTML, CSS, JavaScript
+**Backend:** Node.js,Express js
+**Database:** MySQL/phpmyadmin (XAMPP)
 Version Control: Git
