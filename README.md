@@ -89,6 +89,18 @@
 * Logout functionality 
 
  ![image alt](https://github.com/Rimjhim018/Movie_ticket_booking_system/blob/91f406c084b18058b53ef74e446c212d89e1f30a/User_Reg.png)
+
+
+## 2.User Profile Management
+
+Users can manage their  personal information. 
+
+**Features include:** 
+• View profile 
+• Update personal information 
+• Change password 
+
+ ![image alt](https://github.com/Rimjhim018/Movie_ticket_booking_system/blob/6e8b4d4b28a30a925ffe3697487af8962c7ef10b/User_Profile.png)
   
 
 
