@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — CineBook</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo">Cine<span>Book</span></a>
+  <div class="nav-links">
+    <a href="index.html">Movies</a>
+    <a href="register.html" class="btn-nav">Register</a>
+  </div>
+</nav>
+
+<div class="auth-page">
+  <div class="auth-box">
+    <h2>Welcome Back</h2>
+    <p>Log in to book your tickets</p>
+
+    <div class="alert alert-error" id="err-msg"></div>
+    <div class="alert alert-success" id="ok-msg"></div>
+
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="email" placeholder="you@email.com"/>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="••••••••"/>
+    </div>
+
+    <button class="btn btn-primary btn-full" onclick="login()">Login</button>
+    <p style="text-align:center;margin-top:1.2rem;font-size:0.88rem;color:var(--muted)">
+      Don't have an account? <a href="register.html">Register here</a>
+    </p>
+    <p style="text-align:center;margin-top:0.5rem;font-size:0.8rem;color:var(--muted)">
+      Admin: admin@cinema.com / admin123
+    </p>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:5000/api';
+
+function showError(msg) {
+  const el = document.getElementById('err-msg');
+  el.textContent = msg; el.classList.add('show');
+  document.getElementById('ok-msg').classList.remove('show');
+}
+function showSuccess(msg) {
+  const el = document.getElementById('ok-msg');
+  el.textContent = msg; el.classList.add('show');
+  document.getElementById('err-msg').classList.remove('show');
+}
+
+async function login() {
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  if (!email || !password) return showError('Please fill in all fields');
+
+  try {
+    const res = await fetch(`${API}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) return showError(data.error || 'Login failed');
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    showSuccess('Login successful! Redirecting...');
+    setTimeout(() => {
+      location.href = data.user.role === 'admin' ? 'admin.html' : 'index.html';
+    }, 800);
+  } catch(e) {
+    showError('Cannot connect to server. Make sure backend is running.');
+  }
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+</script>
+</body>
+</html>

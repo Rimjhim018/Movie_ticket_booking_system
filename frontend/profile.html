@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Profile — CineBook</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo">Cine<span>Book</span></a>
+  <div class="nav-links">
+    <a href="index.html">Movies</a>
+    <a href="profile.html" class="active">My Bookings</a>
+    <a href="#" class="btn-nav" onclick="logout()">Logout</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="profile-layout">
+
+    <!-- PROFILE SIDEBAR -->
+    <div>
+      <div class="card" style="padding:1.5rem;margin-bottom:1.5rem">
+        <div style="text-align:center;margin-bottom:1.5rem">
+          <div style="width:72px;height:72px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 0.8rem">
+            👤
+          </div>
+          <h3 id="prof-name">Loading...</h3>
+          <p id="prof-email" class="text-muted" style="font-size:0.85rem"></p>
+          <span class="badge" id="prof-role"></span>
+        </div>
+        <p class="text-muted" style="font-size:0.8rem;text-align:center">Member since <span id="prof-since"></span></p>
+      </div>
+
+      <div class="card" style="padding:1.5rem">
+        <div class="section-title" style="font-size:1.2rem">Update Profile</div>
+        <div class="alert alert-error" id="upd-err"></div>
+        <div class="alert alert-success" id="upd-ok"></div>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="upd-name" placeholder="Your name"/>
+        </div>
+        <div class="form-group">
+          <label>New Password <span class="text-muted">(leave blank to keep)</span></label>
+          <input type="password" id="upd-pass" placeholder="New password"/>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="updateProfile()">Save Changes</button>
+      </div>
+    </div>
+
+    <!-- BOOKINGS -->
+    <div>
+      <div class="section-title">My Bookings</div>
+      <div id="bookings-loading" class="loading"><div class="spinner"></div></div>
+      <div id="bookings-list"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:5000/api';
+const token = localStorage.getItem('token');
+const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+if (!user || !token) { location.href = 'login.html'; }
+
+function logout() { localStorage.clear(); location.href = 'index.html'; }
+
+async function loadProfile() {
+  try {
+    const res = await fetch(`${API}/profile`, { headers: { Authorization: `Bearer ${token}` } });
+    const p = await res.json();
+    document.getElementById('prof-name').textContent = p.name;
+    document.getElementById('prof-email').textContent = p.email;
+    document.getElementById('prof-role').textContent = p.role;
+    document.getElementById('prof-since').textContent = new Date(p.created_at).toLocaleDateString();
+    document.getElementById('upd-name').value = p.name;
+  } catch(e) {}
+}
+
+async function loadBookings() {
+  try {
+    const res = await fetch(`${API}/bookings/my`, { headers: { Authorization: `Bearer ${token}` } });
+    const bookings = await res.json();
+    document.getElementById('bookings-loading').style.display = 'none';
+    const container = document.getElementById('bookings-list');
+    if (!bookings.length) {
+      container.innerHTML = '<div class="empty-state"><p>No bookings yet. <a href="index.html" style="color:var(--accent)">Browse movies →</a></p></div>';
+      return;
+    }
+    container.innerHTML = bookings.map(b => `
+      <div class="booking-item">
+        <img src="${b.poster_url || 'https://via.placeholder.com/50x75/13131a/888?text=?'}"
+             onerror="this.src='https://via.placeholder.com/50x75/13131a/888?text=?'" />
+        <div class="booking-info">
+          <h4>${b.movie_title}</h4>
+          <p>${b.show_date} at ${b.show_time?.slice(0,5)} • ${b.hall_number}</p>
+          <p>Seats: <strong>${b.seat_numbers}</strong> • Total: <strong>৳${b.total_price}</strong></p>
+          <p>Booked: ${new Date(b.booking_date).toLocaleString()}</p>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <span class="badge status-${b.status}" style="background:${b.status==='confirmed'?'rgba(46,196,182,0.1)':'rgba(230,57,70,0.1)'};color:${b.status==='confirmed'?'var(--success)':'var(--accent)'}">
+            ${b.status.toUpperCase()}
+          </span>
+          ${b.status === 'confirmed' ? `
+            <br/>
+            <button class="btn btn-outline btn-sm" style="margin-top:0.5rem" onclick="cancelBooking(${b.booking_id}, this)">Cancel</button>
+          ` : ''}
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {
+    document.getElementById('bookings-loading').innerHTML = '<p class="text-muted">Error loading bookings.</p>';
+  }
+}
+
+async function cancelBooking(id, btn) {
+  if (!confirm('Cancel this booking?')) return;
+  btn.disabled = true;
+  try {
+    const res = await fetch(`${API}/bookings/${id}/cancel`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (res.ok) loadBookings();
+    else { const d = await res.json(); alert(d.error); }
+  } catch(e) { alert('Error cancelling booking'); }
+}
+
+async function updateProfile() {
+  const name = document.getElementById('upd-name').value.trim();
+  const password = document.getElementById('upd-pass').value;
+  if (!name) return;
+
+  try {
+    const res = await fetch(`${API}/profile`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ name, password: password || undefined })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      document.getElementById('upd-ok').textContent = 'Profile updated!';
+      document.getElementById('upd-ok').classList.add('show');
+      document.getElementById('upd-err').classList.remove('show');
+      document.getElementById('upd-pass').value = '';
+    } else {
+      document.getElementById('upd-err').textContent = data.error;
+      document.getElementById('upd-err').classList.add('show');
+    }
+  } catch(e) { alert('Error updating profile'); }
+}
+
+loadProfile();
+loadBookings();
+</script>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Book Tickets — CineBook</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo">Cine<span>Book</span></a>
+  <div class="nav-links">
+    <a href="index.html">← Back to Movies</a>
+    <a href="profile.html" id="nav-profile" style="display:none">My Bookings</a>
+    <a href="login.html" class="btn-nav" id="nav-login">Login</a>
+    <a href="#" class="btn-nav" id="nav-logout" style="display:none" onclick="logout()">Logout</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div id="loading" class="loading"><div class="spinner"></div><p>Loading...</p></div>
+  <div id="content" style="display:none">
+
+    <!-- Movie Info -->
+    <div class="flex gap-2 items-center mb-2" style="flex-wrap:wrap;margin-bottom:2rem">
+      <img id="movie-poster" src="" alt="" style="width:80px;border-radius:8px;"/>
+      <div>
+        <h2 id="movie-title" style="font-family:'Bebas Neue',cursive;font-size:2rem;letter-spacing:2px"></h2>
+        <p id="movie-meta" class="text-muted" style="font-size:0.9rem"></p>
+      </div>
+    </div>
+
+    <!-- Showtimes -->
+    <div class="section-title">Select Showtime</div>
+    <div class="showtimes-list" id="showtimes"></div>
+
+    <!-- Booking Layout -->
+    <div class="booking-layout" id="seat-section" style="display:none">
+      <div>
+        <div class="section-title">Select Seats</div>
+        <div class="screen"></div>
+        <div class="screen-label">SCREEN — ALL EYES THIS WAY</div>
+        <div class="seats-grid" id="seats-grid"></div>
+        <div class="seat-legend">
+          <div class="legend-item"><div class="legend-box" style="background:var(--surface);border:1px solid var(--border)"></div>Available</div>
+          <div class="legend-item"><div class="legend-box" style="background:var(--accent)"></div>Selected</div>
+          <div class="legend-item"><div class="legend-box" style="background:#2a2a2a;border:1px solid #222"></div>Booked</div>
+        </div>
+      </div>
+
+      <div class="booking-summary">
+        <div class="section-title" style="font-size:1.3rem">Summary</div>
+        <div id="summary-movie" class="summary-row"><span class="text-muted">Movie</span><span id="s-movie">—</span></div>
+        <div class="summary-row"><span class="text-muted">Date</span><span id="s-date">—</span></div>
+        <div class="summary-row"><span class="text-muted">Time</span><span id="s-time">—</span></div>
+        <div class="summary-row"><span class="text-muted">Hall</span><span id="s-hall">—</span></div>
+        <div class="summary-row"><span class="text-muted">Seats</span><span id="s-seats">None</span></div>
+        <div class="summary-row"><span class="text-muted">Price/seat</span><span id="s-price">—</span></div>
+        <div class="summary-row total"><span>Total</span><span id="s-total">৳0</span></div>
+        <div class="alert alert-error" id="book-err" style="margin-top:1rem"></div>
+        <div class="alert alert-success" id="book-ok" style="margin-top:1rem"></div>
+        <button class="btn btn-primary btn-full" style="margin-top:1rem" id="confirm-btn" onclick="confirmBooking()">Confirm Booking</button>
+      </div>
+    </div>
+
+    <div id="no-showtimes" style="display:none" class="empty-state">
+      <p>No upcoming showtimes for this movie.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:5000/api';
+const params = new URLSearchParams(location.search);
+const movieId = params.get('movie');
+const token = localStorage.getItem('token');
+const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+if (user) {
+  document.getElementById('nav-login').style.display = 'none';
+  document.getElementById('nav-logout').style.display = 'inline-flex';
+  document.getElementById('nav-profile').style.display = 'inline';
+}
+function logout() { localStorage.clear(); location.href = 'index.html'; }
+
+let selectedShowtime = null;
+let selectedSeats = [];
+let seatPrice = 0;
+
+if (!movieId) location.href = 'index.html';
+
+async function init() {
+  try {
+    const [mRes, stRes] = await Promise.all([
+      fetch(`${API}/movies/${movieId}`),
+      fetch(`${API}/showtimes/${movieId}`)
+    ]);
+    const movie = await mRes.json();
+    const showtimes = await stRes.json();
+
+    document.getElementById('movie-poster').src = movie.poster_url || '';
+    document.getElementById('movie-title').textContent = movie.movie_title;
+    document.getElementById('movie-meta').textContent = `${movie.genre} • ${movie.duration} min • ${movie.description?.substring(0,80)}...`;
+    document.getElementById('s-movie').textContent = movie.movie_title;
+
+    const stContainer = document.getElementById('showtimes');
+    if (!showtimes.length) {
+      document.getElementById('no-showtimes').style.display = 'block';
+    } else {
+      showtimes.forEach(st => {
+        const btn = document.createElement('button');
+        btn.className = 'showtime-btn';
+        btn.innerHTML = `<strong>${st.show_date}</strong><br>${st.show_time.slice(0,5)} • ${st.hall_number}<br><span style="color:var(--accent)">৳${st.price} • ${st.available_seats} seats left</span>`;
+        btn.onclick = () => selectShowtime(st, btn);
+        stContainer.appendChild(btn);
+      });
+    }
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+  } catch(e) {
+    document.getElementById('loading').innerHTML = '<div class="empty-state"><p>Error loading data. Make sure backend is running.</p></div>';
+  }
+}
+
+async function selectShowtime(st, btn) {
+  document.querySelectorAll('.showtime-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedShowtime = st;
+  selectedSeats = [];
+  seatPrice = parseFloat(st.price);
+  document.getElementById('s-date').textContent = st.show_date;
+  document.getElementById('s-time').textContent = st.show_time.slice(0,5);
+  document.getElementById('s-hall').textContent = st.hall_number;
+  document.getElementById('s-price').textContent = `৳${st.price}`;
+  document.getElementById('seat-section').style.display = 'grid';
+  await loadSeats(st.showtime_id);
+  updateSummary();
+}
+
+async function loadSeats(showtimeId) {
+  const res = await fetch(`${API}/seats/${showtimeId}`);
+  const seats = await res.json();
+  const grid = document.getElementById('seats-grid');
+  grid.innerHTML = seats.map(s => `
+    <button class="seat ${s.is_booked ? 'booked' : ''}" id="seat-${s.seat_number}"
+      data-seat="${s.seat_number}" onclick="${s.is_booked ? '' : `toggleSeat('${s.seat_number}')`}">
+      ${s.seat_number}
+    </button>
+  `).join('');
+}
+
+function toggleSeat(seatNum) {
+  const btn = document.getElementById(`seat-${seatNum}`);
+  if (selectedSeats.includes(seatNum)) {
+    selectedSeats = selectedSeats.filter(s => s !== seatNum);
+    btn.classList.remove('selected');
+  } else {
+    if (selectedSeats.length >= 8) { alert('Max 8 seats per booking'); return; }
+    selectedSeats.push(seatNum);
+    btn.classList.add('selected');
+  }
+  updateSummary();
+}
+
+function updateSummary() {
+  document.getElementById('s-seats').textContent = selectedSeats.length ? selectedSeats.join(', ') : 'None';
+  document.getElementById('s-total').textContent = `৳${(selectedSeats.length * seatPrice).toFixed(2)}`;
+}
+
+async function confirmBooking() {
+  if (!user) { location.href = 'login.html'; return; }
+  if (!selectedSeats.length) { showBookErr('Please select at least one seat'); return; }
+
+  document.getElementById('confirm-btn').disabled = true;
+  document.getElementById('confirm-btn').textContent = 'Processing...';
+
+  try {
+    const res = await fetch(`${API}/bookings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ showtime_id: selectedShowtime.showtime_id, seat_numbers: selectedSeats })
+    });
+    const data = await res.json();
+    if (!res.ok) { showBookErr(data.error); return; }
+
+    document.getElementById('book-err').classList.remove('show');
+    document.getElementById('book-ok').textContent = `✅ Booking confirmed! ID: #${data.booking_id} | Total: ৳${data.total_price}`;
+    document.getElementById('book-ok').classList.add('show');
+    document.getElementById('confirm-btn').textContent = 'Booked!';
+
+    // Mark seats visually
+    selectedSeats.forEach(s => {
+      const btn = document.getElementById(`seat-${s}`);
+      if (btn) { btn.classList.remove('selected'); btn.classList.add('booked'); }
+    });
+    selectedSeats = [];
+    updateSummary();
+    setTimeout(() => location.href = 'profile.html', 2000);
+  } catch(e) {
+    showBookErr('Error connecting to server');
+  } finally {
+    document.getElementById('confirm-btn').disabled = false;
+    if (!document.getElementById('book-ok').classList.contains('show'))
+      document.getElementById('confirm-btn').textContent = 'Confirm Booking';
+  }
+}
+
+function showBookErr(msg) {
+  const el = document.getElementById('book-err');
+  el.textContent = msg; el.classList.add('show');
+  document.getElementById('confirm-btn').disabled = false;
+  document.getElementById('confirm-btn').textContent = 'Confirm Booking';
+}
+
+init();
+</script>
+</body>
+</html>

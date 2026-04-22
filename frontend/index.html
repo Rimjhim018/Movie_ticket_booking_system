@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CineBook — Movie Tickets</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="index.html" class="logo">Cine<span>Book</span></a>
+  <div class="nav-links">
+    <a href="index.html" class="active">Movies</a>
+    <a href="profile.html" id="nav-profile" style="display:none">My Bookings</a>
+    <a href="admin.html" id="nav-admin" style="display:none">Admin</a>
+    <a href="login.html" class="btn-nav" id="nav-login">Login</a>
+    <a href="#" class="btn-nav" id="nav-logout" style="display:none" onclick="logout()">Logout</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Book Your <span>Cinema</span> Experience</h1>
+  <p>Browse the latest movies, pick your seats, and enjoy the show.</p>
+</div>
+
+<!-- SEARCH -->
+<div style="padding: 0 2rem; max-width:1200px; margin:0 auto;">
+  <div class="search-bar">
+    <input type="text" id="search" placeholder="🔍 Search movies..." oninput="filterMovies()" />
+    <select id="genre-filter" onchange="filterMovies()">
+      <option value="">All Genres</option>
+    </select>
+    <select id="sort" onchange="filterMovies()">
+      <option value="">Sort by</option>
+      <option value="newest">Newest First</option>
+      <option value="oldest">Oldest First</option>
+    </select>
+  </div>
+</div>
+
+<!-- MOVIES GRID -->
+<div id="movies-container">
+  <div class="loading"><div class="spinner"></div><p>Loading movies...</p></div>
+</div>
+
+<script>
+const API = 'http://localhost:5000/api';
+let allMovies = [];
+
+// Check auth
+const user = JSON.parse(localStorage.getItem('user') || 'null');
+if (user) {
+  document.getElementById('nav-login').style.display = 'none';
+  document.getElementById('nav-logout').style.display = 'inline-flex';
+  document.getElementById('nav-profile').style.display = 'inline';
+  if (user.role === 'admin') document.getElementById('nav-admin').style.display = 'inline';
+}
+
+function logout() {
+  localStorage.clear();
+  location.reload();
+}
+
+async function loadGenres() {
+  try {
+    const r = await fetch(`${API}/genres`);
+    const genres = await r.json();
+    const sel = document.getElementById('genre-filter');
+    genres.forEach(g => {
+      const opt = document.createElement('option');
+      opt.value = g; opt.textContent = g;
+      sel.appendChild(opt);
+    });
+  } catch(e) {}
+}
+
+async function loadMovies() {
+  try {
+    const r = await fetch(`${API}/movies`);
+    allMovies = await r.json();
+    renderMovies(allMovies);
+  } catch(e) {
+    document.getElementById('movies-container').innerHTML =
+      '<div class="empty-state"><p>⚠️ Cannot connect to server. Make sure backend is running.</p></div>';
+  }
+}
+
+function filterMovies() {
+  const search = document.getElementById('search').value.toLowerCase();
+  const genre = document.getElementById('genre-filter').value;
+  const sort = document.getElementById('sort').value;
+  let filtered = allMovies.filter(m => {
+    return (!search || m.movie_title.toLowerCase().includes(search)) &&
+           (!genre || m.genre === genre);
+  });
+  if (sort === 'newest') filtered.sort((a,b) => new Date(b.release_date) - new Date(a.release_date));
+  if (sort === 'oldest') filtered.sort((a,b) => new Date(a.release_date) - new Date(b.release_date));
+  renderMovies(filtered);
+}
+
+function renderMovies(movies) {
+  const container = document.getElementById('movies-container');
+  if (!movies.length) {
+    container.innerHTML = '<div class="empty-state"><p>No movies found.</p></div>';
+    return;
+  }
+  container.innerHTML = `<div class="movies-grid">${movies.map(m => `
+    <div class="card movie-card" onclick="location.href='booking.html?movie=${m.movie_id}'">
+      <img src="${m.poster_url || 'https://via.placeholder.com/300x450/13131a/888?text=No+Poster'}"
+           alt="${m.movie_title}" onerror="this.src='https://via.placeholder.com/300x450/13131a/888?text=No+Poster'" />
+      <div class="movie-card-body">
+        <h3>${m.movie_title}</h3>
+        <div class="flex gap-1 items-center mt-1">
+          <span class="badge">${m.genre || 'N/A'}</span>
+          <span class="text-muted" style="font-size:0.78rem">${m.duration ? m.duration+'min' : ''}</span>
+        </div>
+        <button class="btn btn-primary btn-full mt-1" style="margin-top:0.8rem;">Book Now</button>
+      </div>
+    </div>
+  `).join('')}</div>`;
+}
+
+loadGenres();
+loadMovies();
+</script>
+</body>
+</html>
