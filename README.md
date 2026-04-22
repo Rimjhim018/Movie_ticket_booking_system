@@ -162,6 +162,7 @@ Admins can manage movies in the system. Functions include:
   
 * Delete movies
 
+ ![image alt]((https://github.com/Rimjhim018/Movie_ticket_booking_system/blob/fd73ad0ab2b3a1fee7d94f8b84d947c7cde53cbb/Movies.png)
 
 ## 8. User Management 
 
