@@ -5,7 +5,7 @@
 # Group Details:
 ## Group Number: 04
 ## Team Members and Individual Contributions:
-### 1. Nasruma Hossain Nuha ID:241-115-256
+### 1. Nasruma Hussain Nuha ID:241-115-256
 #### •Contributions:(Frontend)
   * Designed and developed the frontend of the Movie Booking System using HTML and CSS for a clean and responsive user interface.
 
@@ -153,8 +153,7 @@ The dashboard provides an overview of system statistics.
  ![image alt](https://github.com/Rimjhim018/Movie_ticket_booking_system/blob/346d097c1d71a8008110a6324db625268d24a490/Admin.png)
 
 
-## 7.Movie Insert & Delete
-
+## 7.Movie Insert JavaScript
 Admins can manage movies in the system. Functions include: 
 * Add new movies
  
@@ -201,5 +200,7 @@ A brief explanation of the backend, node.js code, database interactions, and que
 ## Technologies Used:
 **Frontend:** HTML, CSS, JavaScript
 **Backend:** Node.js,Express js
+
 **Database:** MySQL/phpmyadmin (XAMPP)
+
 Version Control: Git
