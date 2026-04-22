@@ -102,17 +102,19 @@ Users can manage their  personal information.
 
  ![image alt](https://github.com/Rimjhim018/Movie_ticket_booking_system/blob/6e8b4d4b28a30a925ffe3697487af8962c7ef10b/User_Profile.png)
 
- ## 3.Booking History 
+ ## 3.Showtime 
  
 Users can view their previous bookings. 
 
 Features include: 
 
-* View booked tickets
+* View Total Seats
 
-* Booking details 
+* Show details 
 
-* Booking date and time
+* Show date and time
+
+ ![image alt](https://github.com/Rimjhim018/Movie_ticket_booking_system/blob/b2d77e34ff6c2e72a9fb8ae5ecc0bbbacef0bd8a/Show_time.png)
 
 
   
