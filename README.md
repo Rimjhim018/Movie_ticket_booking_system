@@ -174,6 +174,8 @@ Admins can manage user accounts.
  
 * Delete user accounts
 
+   ![image alt](https://github.com/Rimjhim018/Movie_ticket_booking_system/blob/c218e613e9d0eb53fd6bc80a534b1ad7be807882/Users_show.png)
+
 
 
  
