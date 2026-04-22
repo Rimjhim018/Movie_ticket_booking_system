@@ -117,7 +117,14 @@ Features include:
  ![image alt](https://github.com/Rimjhim018/Movie_ticket_booking_system/blob/b2d77e34ff6c2e72a9fb8ae5ecc0bbbacef0bd8a/Show_time.png)
 
  ## 4.Seat Selection
+ 
+* Display real-time available seats
+* 
+*Allow users to select preferred seats
 
+*Mark booked seats as unavailable
+
+![image alt](https://github.com/Rimjhim018/Movie_ticket_booking_system/blob/6bbfb2a88f647ca2ff27209f319e6a5bc2a83864/Seats.png)
  
 
 
