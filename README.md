@@ -119,10 +119,10 @@ Features include:
  ## 4.Seat Selection
  
 * Display real-time available seats
-* 
-*Allow users to select preferred seats
+  
+* Allow users to select preferred seats
 
-*Mark booked seats as unavailable
+* Mark booked seats as unavailable
 
 ![image alt](https://github.com/Rimjhim018/Movie_ticket_booking_system/blob/6bbfb2a88f647ca2ff27209f319e6a5bc2a83864/Seats.png)
  
