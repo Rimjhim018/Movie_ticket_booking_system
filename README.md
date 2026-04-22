@@ -116,6 +116,10 @@ Features include:
 
  ![image alt](https://github.com/Rimjhim018/Movie_ticket_booking_system/blob/b2d77e34ff6c2e72a9fb8ae5ecc0bbbacef0bd8a/Show_time.png)
 
+ ## 4.Seat Selection
+
+ 
+
 
   
 
