@@ -1,7 +1,7 @@
 # Movie_ticket_booking_system
 
 
-Group Details:
+##Group Details:
 Group Number: 04
 Team Members and Individual Contributions:
 
