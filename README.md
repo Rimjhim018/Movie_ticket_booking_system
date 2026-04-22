@@ -101,6 +101,20 @@ Users can manage their  personal information.
 • Change password 
 
  ![image alt](https://github.com/Rimjhim018/Movie_ticket_booking_system/blob/6e8b4d4b28a30a925ffe3697487af8962c7ef10b/User_Profile.png)
+
+ ## 3.Booking History 
+ 
+Users can view their previous bookings. 
+
+Features include: 
+
+* View booked tickets
+
+* Booking details 
+
+* Booking date and time
+
+
   
 
 
