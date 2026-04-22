@@ -150,6 +150,8 @@ The dashboard provides an overview of system statistics.
   
 * Total bookings
 
+ ![image alt](https://github.com/Rimjhim018/Movie_ticket_booking_system/blob/346d097c1d71a8008110a6324db625268d24a490/Admin.png)
+
 
 ## 7.Movie Insert & Delete
 
