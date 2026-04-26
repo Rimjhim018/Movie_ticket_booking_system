@@ -191,7 +191,7 @@ Admins can manage user accounts.
 
 ## Video Link:
 
-[!Watch video](https://github.com/Rimjhim018/Movie_ticket_booking_system/blob/20122fe7ec7f34d105cfb5b6875a7923d38c9f37/VID-20260426-WA0023.mp4)
+[Watch video!](https://github.com/Rimjhim018/Movie_ticket_booking_system/blob/20122fe7ec7f34d105cfb5b6875a7923d38c9f37/VID-20260426-WA0023.mp4)
 
 All functionalities implemented in the project.
 
